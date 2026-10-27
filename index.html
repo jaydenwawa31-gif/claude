@@ -1,118 +1,297 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#111827">
-  <title>Procrastination Station 🚂</title>
-  <style>
-    :root { color-scheme: dark; --bg:#0b1020; --panel:#151d33; --text:#f4f7ff; --muted:#a9b5d0; --accent:#8b5cf6; --lime:#bef264; }
-    * { box-sizing:border-box; }
-    body { margin:0; min-height:100vh; font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif; color:var(--text); background:radial-gradient(ellipse at top,#22234d 0%,var(--bg) 55%); display:grid; place-items:center; padding:24px; }
-    main { width:min(760px,100%); }
-    .eyebrow { color:var(--lime); text-transform:uppercase; letter-spacing:.16em; font-size:.75rem; font-weight:800; }
-    h1 { font-size:clamp(2.4rem,8vw,5rem); line-height:.98; letter-spacing:-.06em; margin:12px 0; }
-    .sub { color:var(--muted); font-size:1.08rem; line-height:1.6; max-width:55ch; }
-    .card { background:linear-gradient(145deg,#1b2541ee,#11182bee); border:1px solid #ffffff1c; border-radius:24px; padding:clamp(20px,5vw,36px); margin-top:26px; box-shadow:0 24px 70px #0005; }
-    .label { color:var(--muted); font-size:.8rem; font-weight:800; text-transform:uppercase; letter-spacing:.12em; }
-    #mission { font-size:clamp(1.4rem,4vw,2rem); line-height:1.3; margin:14px 0 24px; }
-    .buttons { display:flex; flex-wrap:wrap; gap:10px; }
-    button { border:0; border-radius:12px; padding:13px 17px; font:inherit; font-weight:800; cursor:pointer; transition:transform .15s,filter .15s; }
-    button:hover { transform:translateY(-2px); filter:brightness(1.08); }
-    button:focus-visible { outline:3px solid var(--lime); outline-offset:3px; }
-    .primary { background:var(--lime); color:#17200b; }
-    .secondary { background:#ffffff12; color:var(--text); border:1px solid #ffffff20; }
-    .progress-wrap { height:9px; background:#ffffff14; border-radius:99px; overflow:hidden; margin:18px 0 8px; }
-    #progress { height:100%; width:0%; background:linear-gradient(90deg,var(--accent),var(--lime)); transition:width .3s; }
-    .stats { display:flex; justify-content:space-between; gap:12px; color:var(--muted); font-size:.9rem; }
-    .bottom { display:flex; flex-wrap:wrap; gap:12px; margin-top:18px; }
-    .mini { flex:1; min-width:190px; background:#ffffff08; border:1px solid #ffffff12; border-radius:16px; padding:16px; }
-    .mini strong { display:block; font-size:1.5rem; margin-bottom:5px; }
-    footer { color:#8290af; text-align:center; font-size:.85rem; margin:24px 0 4px; }
-    .toast { min-height:1.5em; color:var(--lime); margin-top:15px; font-weight:700; }
-    @media(prefers-reduced-motion:reduce) { *,*::before,*::after { transition:none !important; } }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Commit Roulette + Git Rescue Kit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cobalt: #2b3fe0;
+    --cobalt-deep: #1e2eb0;
+    --paper: #fffdf5;
+    --sun: #ffd23f;
+    --ink: #14163a;
+    --pink: #ff6b9d;
+    --font: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--cobalt);
+    color: var(--paper);
+    font-family: var(--font);
+    font-size: 1.0625rem;
+    line-height: 1.55;
+  }
+  main { max-width: 46rem; margin: 0 auto; padding: 3rem 1.25rem 4rem; }
+  h1 {
+    font-size: clamp(2.4rem, 8vw, 4.2rem);
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin: 0 0 0.75rem;
+  }
+  .lede { max-width: 34rem; margin: 0 0 2.5rem; color: #dfe3ff; }
+
+  /* The roulette card is the one loud thing on the page */
+  .roulette {
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+    box-shadow: 0.5rem 0.5rem 0 var(--ink);
+  }
+  .log { font-family: var(--mono); font-size: 0.9rem; margin: 0 0 1rem; padding: 0; list-style: none; color: #6b6e8f; }
+  .log li { padding: 0.15rem 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .log .sha { color: var(--pink); }
+  .current {
+    font-size: clamp(1.6rem, 5.5vw, 2.5rem);
+    font-weight: 800;
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    margin: 0 0 1.25rem;
+    min-height: 3.4em;
+  }
+  .current .sha { font-family: var(--mono); font-size: 0.9rem; font-weight: 400; color: var(--pink); display: block; margin-bottom: 0.4rem; letter-spacing: 0; }
+  .row { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+  button {
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    padding: 0.65rem 1.3rem;
+    background: var(--sun);
+    color: var(--ink);
+  }
+  button.quiet { background: transparent; }
+  button:hover { background: var(--pink); }
+  button:active { transform: translateY(2px); }
+  button:focus-visible, summary:focus-visible { outline: 3px solid var(--sun); outline-offset: 3px; }
+  .roulette button:focus-visible { outline-color: var(--cobalt); }
+
+  h2 { font-size: 1.9rem; letter-spacing: -0.02em; margin: 3.5rem 0 0.5rem; font-weight: 800; }
+  .sub { margin: 0 0 1.25rem; color: #dfe3ff; }
+
+  details {
+    background: var(--cobalt-deep);
+    border-radius: 0.9rem;
+    margin-bottom: 0.6rem;
+  }
+  summary {
+    cursor: pointer;
+    padding: 0.9rem 1.1rem;
+    font-weight: 600;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; font-size: 1.4rem; line-height: 1; color: var(--sun); }
+  details[open] summary::after { content: "–"; }
+  .body { padding: 0 1.1rem 1.1rem; }
+  .body p { margin: 0 0 0.75rem; color: #dfe3ff; }
+  pre {
+    position: relative;
+    margin: 0;
+    padding: 0.9rem 1rem;
+    background: var(--ink);
+    border-radius: 0.6rem;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+  pre button { position: absolute; top: 0.5rem; right: 0.5rem; padding: 0.2rem 0.7rem; font-size: 0.8rem; background: var(--sun); }
+  pre code { display: block; padding-right: 4.5rem; white-space: pre; }
+  .warn { color: var(--sun); font-weight: 600; }
+
+  footer { margin-top: 3.5rem; color: #b9c0ff; font-size: 0.95rem; }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    button:active { transform: none; }
+  }
+</style>
 </head>
 <body>
-  <main>
-    <div class="eyebrow">A tiny website for your giant to-do list</div>
-    <h1>Procrastination<br>Station 🚂</h1>
-    <p class="sub">Your brain wants a side quest. Fine. Here’s one that might actually help you get something done.</p>
+<main>
+  <h1>Commit Roulette</h1>
+  <p class="lede">Out of ideas for a commit message? Spin for one. Then scroll down for the git fixes you’ll need after you use it.</p>
 
-    <section class="card" aria-live="polite">
-      <div class="label">Your randomly assigned side quest</div>
-      <p id="mission">Take one sip of water. Congratulations, you're now a hydrated legend.</p>
-      <div class="buttons">
-        <button class="primary" id="complete">Quest complete ✓</button>
-        <button class="secondary" id="reroll">Give me another ↻</button>
-      </div>
-      <div class="progress-wrap" role="progressbar" aria-label="Quests completed" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0" id="bar"><div id="progress"></div></div>
-      <div class="stats"><span id="count">0 quests completed</span><span id="rank">Rank: sleepy potato 🥔</span></div>
-      <div class="toast" id="toast" role="status"></div>
-    </section>
-
-    <div class="bottom">
-      <div class="mini"><strong>🧠 Tiny tip</strong><span id="tip">Make the task so small it feels silly not to start.</span></div>
-      <div class="mini"><strong>🎲 Chaos button</strong><span>Need a brain reset? Roll a quest. No productivity guru required.</span><br><br><button class="secondary" id="tipBtn">Random tip</button></div>
+  <section class="roulette" aria-labelledby="current-msg">
+    <ul class="log" id="log" aria-label="Previous commit messages"></ul>
+    <p class="current" id="current" aria-live="polite"><span class="sha" id="sha"></span><span id="current-msg">Press the button.</span></p>
+    <div class="row">
+      <button id="spin" type="button">Spin a commit message</button>
+      <button id="copy" type="button" class="quiet">Copy as git command</button>
     </div>
-    <footer>Made for humans with 47 tabs open. No account. No tracking. Just vibes.</footer>
-  </main>
+  </section>
 
-  <script>
-    const quests = [
-      "Drink some water. Your houseplant energy is increasing. 🌱",
-      "Close one browser tab. Just one. We believe in you.",
-      "Put one thing back where it belongs. Interior design: unlocked.",
-      "Stretch your shoulders for 10 seconds. Become slightly less shrimp-shaped. 🦐",
-      "Write down the ONE thing you most want to finish today.",
-      "Clear a tiny patch of your desk. Archaeologists may find it later.",
-      "Stand up, look away from the screen, and take three slow breaths.",
-      "Reply to one easy message you've been putting off.",
-      "Set a 5-minute timer and start the task. You can stop when it ends.",
-      "Throw away one piece of rubbish. Minimalism speedrun.",
-      "Save your work. Future You says thanks.",
-      "Send someone a nice message. Side quest: wholesome edition 💌",
-      "Read one paragraph of something useful. That's enough to start.",
-      "Put your phone face-down for two minutes. Brave. Historic.",
-      "Pick up five items. The floor has suffered enough."
-    ];
-    const tips = [
-      "Make the task so small it feels silly not to start.",
-      "A rough first draft beats a perfect imaginary one.",
-      "Try 10 minutes of focus, then take a short break.",
-      "Put distracting tabs away before starting one task.",
-      "If you feel stuck, write the very next physical action.",
-      "Done is often more useful than fancy.",
-      "Take breaks, eat, drink water, and get some sleep. You're a person, not a printer."
-    ];
-    let completed = 0, current = 0;
-    const mission = document.querySelector("#mission");
-    const toast = document.querySelector("#toast");
-    function pickQuest() {
-      let next = Math.floor(Math.random() * quests.length);
-      if (quests.length > 1 && next === current) next = (next + 1) % quests.length;
-      current = next;
-      mission.textContent = quests[current];
-      toast.textContent = "";
+  <h2>Git rescue kit</h2>
+  <p class="sub">The seven mistakes everyone makes, and the commands that undo them.</p>
+
+  <details>
+    <summary>My last commit message is wrong</summary>
+    <div class="body">
+      <p>Rewrites the message of the latest commit. Only do this before you push.</p>
+      <pre><code>git commit --amend -m "Better message"</code><button type="button" data-copy>Copy</button></pre>
+    </div>
+  </details>
+
+  <details>
+    <summary>I want to undo my last commit but keep my changes</summary>
+    <div class="body">
+      <p>The commit disappears, your files stay exactly as they are, and the changes are staged again.</p>
+      <pre><code>git reset --soft HEAD~1</code><button type="button" data-copy>Copy</button></pre>
+    </div>
+  </details>
+
+  <details>
+    <summary>I committed to the wrong branch</summary>
+    <div class="body">
+      <p>Move the commit to a new branch, then reset the old one. Replace <code>main</code> with the branch you were on.</p>
+      <pre><code>git switch -c the-right-branch
+git switch main
+git reset --hard origin/main</code><button type="button" data-copy>Copy</button></pre>
+      <p class="warn" style="margin-top:.75rem">The last line discards unpushed commits on main. They’re safe on the new branch.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>I want to throw away my changes to one file</summary>
+    <div class="body">
+      <p>Resets the file to the last committed version. There is no undo for this one.</p>
+      <pre><code>git restore path/to/file</code><button type="button" data-copy>Copy</button></pre>
+    </div>
+  </details>
+
+  <details>
+    <summary>I deleted a branch I still needed</summary>
+    <div class="body">
+      <p>Find the last commit the branch pointed to in the reflog, then recreate the branch there.</p>
+      <pre><code>git reflog
+git switch -c my-branch &lt;sha-from-reflog&gt;</code><button type="button" data-copy>Copy</button></pre>
+    </div>
+  </details>
+
+  <details>
+    <summary>I already pushed a bad commit</summary>
+    <div class="body">
+      <p>Don’t rewrite shared history. Add a new commit that reverses the bad one.</p>
+      <pre><code>git revert &lt;sha&gt;
+git push</code><button type="button" data-copy>Copy</button></pre>
+    </div>
+  </details>
+
+  <details>
+    <summary>I pushed a password or API key</summary>
+    <div class="body">
+      <p class="warn">Revoke and replace the secret first. Deleting the commit doesn’t help, because anyone may already have copied it.</p>
+      <p>Then remove it from history with <code>git filter-repo</code> and force-push, and ask collaborators to re-clone.</p>
+      <pre><code>git filter-repo --replace-text secrets.txt</code><button type="button" data-copy>Copy</button></pre>
+    </div>
+  </details>
+
+  <footer>Made for GitHub Pages. One file, no build step, no tracking. Fork it, add your own messages to the list in the script, and ship it.</footer>
+</main>
+
+<script>
+(function () {
+  var messages = [
+    "fixed bug (created three new ones)",
+    "it works on my machine",
+    "I have no idea why this works, do not touch",
+    "removed the code that was holding the universe together",
+    "final_final_v2_REAL",
+    "commit message goes here",
+    "asdfghjkl",
+    "who wrote this? oh, it was me",
+    "temporary fix (2021)",
+    "fixed typo, introduced bigger typo",
+    "refactor: moved the mess into a different file",
+    "added more TODOs",
+    "tests pass because I deleted the tests",
+    "revert “fix” because the fix broke things",
+    "wip wip wip wip wip",
+    "Friday 5pm deploy, what could go wrong",
+    "made it faster by making it wrong",
+    "no longer crashes on Tuesdays",
+    "blame the intern (there is no intern)",
+    "this commit intentionally left blank"
+  ];
+
+  var currentEl = document.getElementById("current-msg");
+  var shaEl = document.getElementById("sha");
+  var logEl = document.getElementById("log");
+  var history = [];
+  var current = null;
+
+  function fakeSha() {
+    var chars = "0123456789abcdef", s = "";
+    for (var i = 0; i < 7; i++) s += chars[Math.floor(Math.random() * 16)];
+    return s;
+  }
+
+  function spin() {
+    var next;
+    do { next = messages[Math.floor(Math.random() * messages.length)]; }
+    while (next === (current && current.msg) && messages.length > 1);
+
+    if (current) {
+      history.unshift(current);
+      history = history.slice(0, 3);
+      renderLog();
     }
-    function update() {
-      document.querySelector("#count").textContent = `${completed} quest${completed === 1 ? "" : "s"} completed`;
-      document.querySelector("#progress").style.width = `${Math.min(completed,10) * 10}%`;
-      document.querySelector("#bar").setAttribute("aria-valuenow", Math.min(completed,10));
-      const rank = completed >= 10 ? "legendary side-quester 🏆" : completed >= 5 ? "quest machine ⚡" : completed >= 1 ? "certified doer 😎" : "sleepy potato 🥔";
-      document.querySelector("#rank").textContent = `Rank: ${rank}`;
+    current = { sha: fakeSha(), msg: next };
+    shaEl.textContent = "commit " + current.sha;
+    currentEl.textContent = current.msg;
+  }
+
+  function renderLog() {
+    logEl.textContent = "";
+    history.forEach(function (h) {
+      var li = document.createElement("li");
+      var sha = document.createElement("span");
+      sha.className = "sha";
+      sha.textContent = h.sha;
+      li.appendChild(sha);
+      li.appendChild(document.createTextNode(" " + h.msg));
+      logEl.appendChild(li);
+    });
+  }
+
+  function copyText(text, btn, done) {
+    var original = btn.textContent;
+    function flash() { btn.textContent = done; setTimeout(function () { btn.textContent = original; }, 1500); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(flash, function () { btn.textContent = "Copy failed"; });
+    } else {
+      btn.textContent = "Copy failed";
     }
-    document.querySelector("#complete").addEventListener("click", () => {
-      completed++;
-      update();
-      toast.textContent = ["Nicely done. Tiny wins count! ✨","Quest cleared. +10 imaginary XP.","Look at you, getting things done. 🚀"][Math.floor(Math.random()*3)];
-      pickQuest();
+  }
+
+  document.getElementById("spin").addEventListener("click", spin);
+
+  document.getElementById("copy").addEventListener("click", function () {
+    if (!current) spin();
+    var safe = current.msg.replace(/"/g, '\\"');
+    copyText('git commit -m "' + safe + '"', this, "Copied");
+  });
+
+  document.querySelectorAll("button[data-copy]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var code = btn.parentNode.querySelector("code");
+      copyText(code.textContent, btn, "Copied");
     });
-    document.querySelector("#reroll").addEventListener("click", pickQuest);
-    document.querySelector("#tipBtn").addEventListener("click", () => {
-      document.querySelector("#tip").textContent = tips[Math.floor(Math.random()*tips.length)];
-    });
-    update();
-  </script>
+  });
+})();
+</script>
 </body>
 </html>
