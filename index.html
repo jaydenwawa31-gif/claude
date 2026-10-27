@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#111827">
+  <title>Procrastination Station 🚂</title>
+  <style>
+    :root { color-scheme: dark; --bg:#0b1020; --panel:#151d33; --text:#f4f7ff; --muted:#a9b5d0; --accent:#8b5cf6; --lime:#bef264; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif; color:var(--text); background:radial-gradient(ellipse at top,#22234d 0%,var(--bg) 55%); display:grid; place-items:center; padding:24px; }
+    main { width:min(760px,100%); }
+    .eyebrow { color:var(--lime); text-transform:uppercase; letter-spacing:.16em; font-size:.75rem; font-weight:800; }
+    h1 { font-size:clamp(2.4rem,8vw,5rem); line-height:.98; letter-spacing:-.06em; margin:12px 0; }
+    .sub { color:var(--muted); font-size:1.08rem; line-height:1.6; max-width:55ch; }
+    .card { background:linear-gradient(145deg,#1b2541ee,#11182bee); border:1px solid #ffffff1c; border-radius:24px; padding:clamp(20px,5vw,36px); margin-top:26px; box-shadow:0 24px 70px #0005; }
+    .label { color:var(--muted); font-size:.8rem; font-weight:800; text-transform:uppercase; letter-spacing:.12em; }
+    #mission { font-size:clamp(1.4rem,4vw,2rem); line-height:1.3; margin:14px 0 24px; }
+    .buttons { display:flex; flex-wrap:wrap; gap:10px; }
+    button { border:0; border-radius:12px; padding:13px 17px; font:inherit; font-weight:800; cursor:pointer; transition:transform .15s,filter .15s; }
+    button:hover { transform:translateY(-2px); filter:brightness(1.08); }
+    button:focus-visible { outline:3px solid var(--lime); outline-offset:3px; }
+    .primary { background:var(--lime); color:#17200b; }
+    .secondary { background:#ffffff12; color:var(--text); border:1px solid #ffffff20; }
+    .progress-wrap { height:9px; background:#ffffff14; border-radius:99px; overflow:hidden; margin:18px 0 8px; }
+    #progress { height:100%; width:0%; background:linear-gradient(90deg,var(--accent),var(--lime)); transition:width .3s; }
+    .stats { display:flex; justify-content:space-between; gap:12px; color:var(--muted); font-size:.9rem; }
+    .bottom { display:flex; flex-wrap:wrap; gap:12px; margin-top:18px; }
+    .mini { flex:1; min-width:190px; background:#ffffff08; border:1px solid #ffffff12; border-radius:16px; padding:16px; }
+    .mini strong { display:block; font-size:1.5rem; margin-bottom:5px; }
+    footer { color:#8290af; text-align:center; font-size:.85rem; margin:24px 0 4px; }
+    .toast { min-height:1.5em; color:var(--lime); margin-top:15px; font-weight:700; }
+    @media(prefers-reduced-motion:reduce) { *,*::before,*::after { transition:none !important; } }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="eyebrow">A tiny website for your giant to-do list</div>
+    <h1>Procrastination<br>Station 🚂</h1>
+    <p class="sub">Your brain wants a side quest. Fine. Here’s one that might actually help you get something done.</p>
+
+    <section class="card" aria-live="polite">
+      <div class="label">Your randomly assigned side quest</div>
+      <p id="mission">Take one sip of water. Congratulations, you're now a hydrated legend.</p>
+      <div class="buttons">
+        <button class="primary" id="complete">Quest complete ✓</button>
+        <button class="secondary" id="reroll">Give me another ↻</button>
+      </div>
+      <div class="progress-wrap" role="progressbar" aria-label="Quests completed" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0" id="bar"><div id="progress"></div></div>
+      <div class="stats"><span id="count">0 quests completed</span><span id="rank">Rank: sleepy potato 🥔</span></div>
+      <div class="toast" id="toast" role="status"></div>
+    </section>
+
+    <div class="bottom">
+      <div class="mini"><strong>🧠 Tiny tip</strong><span id="tip">Make the task so small it feels silly not to start.</span></div>
+      <div class="mini"><strong>🎲 Chaos button</strong><span>Need a brain reset? Roll a quest. No productivity guru required.</span><br><br><button class="secondary" id="tipBtn">Random tip</button></div>
+    </div>
+    <footer>Made for humans with 47 tabs open. No account. No tracking. Just vibes.</footer>
+  </main>
+
+  <script>
+    const quests = [
+      "Drink some water. Your houseplant energy is increasing. 🌱",
+      "Close one browser tab. Just one. We believe in you.",
+      "Put one thing back where it belongs. Interior design: unlocked.",
+      "Stretch your shoulders for 10 seconds. Become slightly less shrimp-shaped. 🦐",
+      "Write down the ONE thing you most want to finish today.",
+      "Clear a tiny patch of your desk. Archaeologists may find it later.",
+      "Stand up, look away from the screen, and take three slow breaths.",
+      "Reply to one easy message you've been putting off.",
+      "Set a 5-minute timer and start the task. You can stop when it ends.",
+      "Throw away one piece of rubbish. Minimalism speedrun.",
+      "Save your work. Future You says thanks.",
+      "Send someone a nice message. Side quest: wholesome edition 💌",
+      "Read one paragraph of something useful. That's enough to start.",
+      "Put your phone face-down for two minutes. Brave. Historic.",
+      "Pick up five items. The floor has suffered enough."
+    ];
+    const tips = [
+      "Make the task so small it feels silly not to start.",
+      "A rough first draft beats a perfect imaginary one.",
+      "Try 10 minutes of focus, then take a short break.",
+      "Put distracting tabs away before starting one task.",
+      "If you feel stuck, write the very next physical action.",
+      "Done is often more useful than fancy.",
+      "Take breaks, eat, drink water, and get some sleep. You're a person, not a printer."
+    ];
+    let completed = 0, current = 0;
+    const mission = document.querySelector("#mission");
+    const toast = document.querySelector("#toast");
+    function pickQuest() {
+      let next = Math.floor(Math.random() * quests.length);
+      if (quests.length > 1 && next === current) next = (next + 1) % quests.length;
+      current = next;
+      mission.textContent = quests[current];
+      toast.textContent = "";
+    }
+    function update() {
+      document.querySelector("#count").textContent = `${completed} quest${completed === 1 ? "" : "s"} completed`;
+      document.querySelector("#progress").style.width = `${Math.min(completed,10) * 10}%`;
+      document.querySelector("#bar").setAttribute("aria-valuenow", Math.min(completed,10));
+      const rank = completed >= 10 ? "legendary side-quester 🏆" : completed >= 5 ? "quest machine ⚡" : completed >= 1 ? "certified doer 😎" : "sleepy potato 🥔";
+      document.querySelector("#rank").textContent = `Rank: ${rank}`;
+    }
+    document.querySelector("#complete").addEventListener("click", () => {
+      completed++;
+      update();
+      toast.textContent = ["Nicely done. Tiny wins count! ✨","Quest cleared. +10 imaginary XP.","Look at you, getting things done. 🚀"][Math.floor(Math.random()*3)];
+      pickQuest();
+    });
+    document.querySelector("#reroll").addEventListener("click", pickQuest);
+    document.querySelector("#tipBtn").addEventListener("click", () => {
+      document.querySelector("#tip").textContent = tips[Math.floor(Math.random()*tips.length)];
+    });
+    update();
+  </script>
+</body>
+</html>
